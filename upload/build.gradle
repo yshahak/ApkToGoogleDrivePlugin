@@ -1,0 +1,27 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+repositories{
+    jcenter()
+}
+
+dependencies{
+    compile gradleApi()
+    compile localGroovy()
+}
+
+uploadArchives {
+    def group =  'funkey.plugins'
+    def version =  '1.3'
+
+    repositories {
+        mavenDeployer {
+            pom.groupId = group
+//            pom.artifactId = 'uploadApk'
+            pom.version = version
+            repository(url: uri('upload_apk_repo'))
+        }
+    }
+}
+
+
