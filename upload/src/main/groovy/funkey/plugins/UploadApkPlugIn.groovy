@@ -11,11 +11,11 @@ class UploadApkPlugIn implements Plugin<Project> {
         project.extensions.create('apkPrefixAndFolderId', VersionPluginExtension)
 
         project.afterEvaluate {
-            project.task('uploadDebug', type: UploadApkToGoogleDrive) {
+            project.task('uploadDebug', type: UploadApkToGoogleDrive) {variant ->
                 def variantName = project.android.defaultConfig.versionName.replaceAll("\\.", "_")
                 versionName = "${project?.apkPrefixAndFolderId?.apk_prefix}${variantName}_dbg.apk"
                 folderId = project?.apkPrefixAndFolderId?.folder_id
-                projectDirPath = project.projectDir
+                projectDirPath = "${project.projectDir}/debug"
             }doLast{
                 println("${versionName} uploaded to Google Drive")
             }
@@ -23,13 +23,14 @@ class UploadApkPlugIn implements Plugin<Project> {
                 def variantName = project.android.defaultConfig.versionName.replaceAll("\\.", "_")
                 versionName = "${project?.apkPrefixAndFolderId?.apk_prefix}${variantName}_prd.apk"
                 folderId = project?.apkPrefixAndFolderId?.folder_id
-                projectDirPath = project.projectDir
+//                projectDirPath = project.projectDir
+                projectDirPath = "${project.projectDir}/release"
             }doLast{
                 println("${versionName} uploaded to Google Drive")
             }
         }
         project.android.applicationVariants.all { variant ->
-            variant.outputs.each { output ->
+            variant.outputs.all { output ->
                 def variantName = project.android.defaultConfig.versionName.replaceAll("\\.", "_")
                 def buildType = variant.variantData.variantConfiguration.buildType.name
                 def apkName
@@ -38,7 +39,9 @@ class UploadApkPlugIn implements Plugin<Project> {
                 } else {
                     apkName = "${project?.apkPrefixAndFolderId?.apk_prefix}${variantName}_prd.apk"
                 }
-                output.outputFile = new File(output.outputFile.parent, apkName)
+                output.outputFileName = apkName
+//                output.outputFile = new File(output.getOutputFileName, apkName)
+                println("apk=${output.outputFileName}")
             }
         }
     }
